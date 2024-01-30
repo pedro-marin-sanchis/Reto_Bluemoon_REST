@@ -1,5 +1,6 @@
 package org.uguinformatica.bluemoon_api.models.dao;
 
+import org.springframework.transaction.annotation.Transactional;
 import org.uguinformatica.bluemoon_api.models.entity.User;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
@@ -14,28 +15,35 @@ public class UserDAOImpl {
     private EntityManager entityManager;
 
     @Autowired
-    public UserDAOImpl(EntityManager entityManager){
+    public UserDAOImpl(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
 
-    public void save(User user){
+    @Transactional
+    public void save(User user) {
         entityManager.persist(user);
     }
 
-    public User findById(long id){
+    public User findById(long id) {
         return entityManager.find(User.class, id);
     }
 
-    public List<User> findAll(){
+
+    public List<User> findAll() {
+
         Query query = entityManager.createQuery("from User ");
-        return  query.getResultList();
+        return query.getResultList();
     }
 
-    public void update(User user){
+    @Transactional
+
+    public void update(User user) {
         entityManager.merge(user);
     }
 
-    public void delete(long id){
+    @Transactional
+
+    public void delete(long id) {
         User user = findById(id);
         entityManager.remove(user);
     }

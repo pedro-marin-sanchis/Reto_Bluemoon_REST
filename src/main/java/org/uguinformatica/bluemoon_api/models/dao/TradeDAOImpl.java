@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import org.uguinformatica.bluemoon_api.models.entity.Trade;
 
 @Repository
@@ -15,6 +16,7 @@ public class TradeDAOImpl implements TradeDAO{
     public TradeDAOImpl(EntityManager entityManager){
         this.entityManager = entityManager;
     }
+    @Transactional
 
     public void save(Trade trade){
         entityManager.persist(trade);
@@ -28,10 +30,12 @@ public class TradeDAOImpl implements TradeDAO{
         Query query = entityManager.createQuery("from Trade ");
         return (Trade[]) query.getResultList().toArray();
     }
+    @Transactional
 
     public void update(Trade trade){
         entityManager.merge(trade);
     }
+    @Transactional
 
     public void delete(long id){
         Trade trade = findById(id);
