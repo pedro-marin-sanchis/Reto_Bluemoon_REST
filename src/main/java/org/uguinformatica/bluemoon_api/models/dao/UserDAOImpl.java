@@ -6,6 +6,8 @@ import jakarta.persistence.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public class UserDAOImpl {
 
@@ -24,9 +26,9 @@ public class UserDAOImpl {
         return entityManager.find(User.class, id);
     }
 
-    public User[] findAll(){
+    public List<User> findAll(){
         Query query = entityManager.createQuery("from User ");
-        return (User[]) query.getResultList().toArray();
+        return  query.getResultList();
     }
 
     public void update(User user){
