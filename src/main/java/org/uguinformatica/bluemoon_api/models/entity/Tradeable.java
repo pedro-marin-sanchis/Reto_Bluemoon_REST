@@ -1,9 +1,14 @@
 package org.uguinformatica.bluemoon_api.models.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "tradeable", schema = "public")
+@Getter
+@Setter
+
 public class Tradeable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id

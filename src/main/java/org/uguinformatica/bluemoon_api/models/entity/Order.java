@@ -1,12 +1,17 @@
 package org.uguinformatica.bluemoon_api.models.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Date;
 import java.util.Set;
 
 @Entity
 @Table(name = "order", schema = "public")
+@Getter
+@Setter
+
 public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id

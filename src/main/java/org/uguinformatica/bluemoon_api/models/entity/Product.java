@@ -1,6 +1,8 @@
 package org.uguinformatica.bluemoon_api.models.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.List;
@@ -8,6 +10,9 @@ import java.util.Set;
 
 @Entity
 @Table(name = "product", schema = "public")
+@Getter
+@Setter
+
 public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id

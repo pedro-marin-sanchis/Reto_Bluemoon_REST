@@ -1,6 +1,9 @@
 package org.uguinformatica.bluemoon_api.models.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.uguinformatica.bluemoon_api.models.entity.keys.CartKey;
 
 @Entity
 public class Cart {

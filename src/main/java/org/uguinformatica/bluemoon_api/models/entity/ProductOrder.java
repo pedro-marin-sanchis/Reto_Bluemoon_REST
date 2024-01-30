@@ -1,6 +1,7 @@
 package org.uguinformatica.bluemoon_api.models.entity;
 
 import jakarta.persistence.*;
+import org.uguinformatica.bluemoon_api.models.entity.keys.ProductOrderKey;
 
 import java.io.Serializable;
 
