@@ -1,5 +1,6 @@
 package com.uguinformatica.bluemoon.apirest.controller;
 
+import com.uguinformatica.bluemoon.apirest.controller.utils.ControllerValidationErrors;
 import com.uguinformatica.bluemoon.apirest.models.dao.OrderDAOImpl;
 import com.uguinformatica.bluemoon.apirest.models.dao.ProductDAOImpl;
 import com.uguinformatica.bluemoon.apirest.models.dao.ProductOrderDAOImpl;
@@ -50,11 +51,7 @@ public class OrdersController {
     public ResponseEntity<?> create(@RequestBody OrderCreateDTO orderCreate, BindingResult result) {
 
         if (result.hasFieldErrors()) {
-            List<String> errors = result.getFieldErrors()
-                    .stream()
-                    .map(err -> "The field '" + err.getField() + "' " + err.getDefaultMessage()).toList();
-
-            return ResponseEntity.badRequest().body(errors);
+            return ControllerValidationErrors.generateFieldErrors(result);
         }
 
         User user = userService.findById(orderCreate.getUserId());
@@ -108,11 +105,8 @@ public class OrdersController {
         }
 
         if (result.hasFieldErrors()) {
-            List<String> errors = result.getFieldErrors()
-                    .stream()
-                    .map(err -> "The field '" + err.getField() + "' " + err.getDefaultMessage()).toList();
+            return ControllerValidationErrors.generateFieldErrors(result);
 
-            return ResponseEntity.badRequest().body(errors);
         }
 
         order.setId(id);

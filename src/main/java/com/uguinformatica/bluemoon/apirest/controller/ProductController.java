@@ -1,5 +1,6 @@
 package com.uguinformatica.bluemoon.apirest.controller;
 
+import com.uguinformatica.bluemoon.apirest.controller.utils.ControllerValidationErrors;
 import com.uguinformatica.bluemoon.apirest.models.dao.ProductDAOImpl;
 import com.uguinformatica.bluemoon.apirest.models.dao.SilverTypeDAOImpl;
 import com.uguinformatica.bluemoon.apirest.models.entity.Product;
@@ -67,11 +68,8 @@ public class ProductController {
         }
 
         if (result.hasFieldErrors()) {
-            List<String> errors = result.getFieldErrors()
-                    .stream()
-                    .map(err -> "The field '" + err.getField() + "' " + err.getDefaultMessage()).toList();
+            return ControllerValidationErrors.generateFieldErrors(result);
 
-            return ResponseEntity.badRequest().body(errors);
         }
 
         productFound.setId(id);

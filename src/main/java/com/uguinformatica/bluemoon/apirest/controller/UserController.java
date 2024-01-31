@@ -1,5 +1,6 @@
 package com.uguinformatica.bluemoon.apirest.controller;
 
+import com.uguinformatica.bluemoon.apirest.controller.utils.ControllerValidationErrors;
 import com.uguinformatica.bluemoon.apirest.models.dao.UserDAOImpl;
 import com.uguinformatica.bluemoon.apirest.models.dto.UserRegisterDTO;
 import com.uguinformatica.bluemoon.apirest.models.entity.User;
@@ -96,11 +97,8 @@ public class UserController {
         }
 
         if (result.hasFieldErrors()) {
-            List<String> errors = result.getFieldErrors()
-                    .stream()
-                    .map(err -> "The field '" + err.getField() + "' " + err.getDefaultMessage()).toList();
+            return ControllerValidationErrors.generateFieldErrors(result);
 
-            return ResponseEntity.badRequest().body(errors);
         }
 
         user.setId(id);

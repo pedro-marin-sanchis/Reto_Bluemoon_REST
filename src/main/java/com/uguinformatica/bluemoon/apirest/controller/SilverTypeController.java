@@ -1,7 +1,9 @@
 package com.uguinformatica.bluemoon.apirest.controller;
 
+import com.uguinformatica.bluemoon.apirest.controller.utils.ControllerValidationErrors;
 import com.uguinformatica.bluemoon.apirest.models.dao.SilverTypeDAOImpl;
 import com.uguinformatica.bluemoon.apirest.models.entity.SilverType;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -16,7 +18,7 @@ public class SilverTypeController {
     @Autowired
     private SilverTypeDAOImpl silverTypeService;
 
-    @GetMapping("/" )
+    @GetMapping("/")
     public ResponseEntity<List<?>> showAll() {
         return ResponseEntity.ok(silverTypeService.findAll());
     }
@@ -30,14 +32,11 @@ public class SilverTypeController {
 
 
     @PostMapping("/")
-    public ResponseEntity<?> create(@RequestBody SilverType silverType, BindingResult result) {
+    public ResponseEntity<?> create(@RequestBody @Valid SilverType silverType, BindingResult result) {
 
         if (result.hasFieldErrors()) {
-            List<String> errors = result.getFieldErrors()
-                    .stream()
-                    .map(err -> "The field '" + err.getField() + "' " + err.getDefaultMessage()).toList();
+            return ControllerValidationErrors.generateFieldErrors(result);
 
-            return ResponseEntity.badRequest().body(errors);
         }
 
 
@@ -56,7 +55,7 @@ public class SilverTypeController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable long id, @RequestBody SilverType silverType, BindingResult result) {
+    public ResponseEntity<?> update(@PathVariable long id, @RequestBody @Valid SilverType silverType, BindingResult result) {
         SilverType silverTypeFound = silverTypeService.findById(id);
 
         if (silverTypeFound == null) {
@@ -64,11 +63,7 @@ public class SilverTypeController {
         }
 
         if (result.hasFieldErrors()) {
-            List<String> errors = result.getFieldErrors()
-                    .stream()
-                    .map(err -> "The field '" + err.getField() + "' " + err.getDefaultMessage()).toList();
-
-            return ResponseEntity.badRequest().body(errors);
+            return ControllerValidationErrors.generateFieldErrors(result);
         }
 
         silverTypeFound.setId(id);
@@ -76,4 +71,6 @@ public class SilverTypeController {
         silverTypeService.update(silverTypeFound);
         return ResponseEntity.ok(silverType);
     }
+
+
 }
