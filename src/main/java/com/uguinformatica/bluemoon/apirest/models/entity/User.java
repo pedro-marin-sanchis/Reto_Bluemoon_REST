@@ -56,7 +56,7 @@ public class User {
     private List<Order> orders;
 
     @OneToMany(mappedBy = "user")
-    private List<Cart> productsInCart  ;
+    private List<CartItem> productsInCart ;
 
     @OneToMany(mappedBy = "user")
     private List<Trade> trades;

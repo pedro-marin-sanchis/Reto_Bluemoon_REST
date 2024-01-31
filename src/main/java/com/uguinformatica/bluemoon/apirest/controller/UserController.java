@@ -27,9 +27,6 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<?> show(@PathVariable String id) {
 
-        if (id == null || id.isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
 
         User user = null;
 
@@ -50,8 +47,24 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
 
+        System.out.println(user.getProductsInCart());
+
         return ResponseEntity.ok(user);
     }
+
+/*    @GetMapping("/{id}/cart")
+    public ResponseEntity<?> showCart(@PathVariable long id) {
+
+        User user = userService.findById(id);
+
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(user.getProductsInCart());
+
+
+    }*/
 
 
     @PostMapping("/")

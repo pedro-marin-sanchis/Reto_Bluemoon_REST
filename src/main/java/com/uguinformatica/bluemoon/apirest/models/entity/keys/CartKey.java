@@ -11,5 +11,5 @@ public class CartKey implements Serializable {
     private int productId;
 
     @Column(name = "user_id")
-    private int userID;
+    private int userId;
 }

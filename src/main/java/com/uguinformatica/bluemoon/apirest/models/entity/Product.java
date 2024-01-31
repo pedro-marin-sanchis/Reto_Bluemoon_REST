@@ -1,5 +1,6 @@
 package com.uguinformatica.bluemoon.apirest.models.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -42,5 +43,6 @@ public class Product {
     Set<ProductOrder> orders;
 
     @OneToMany(mappedBy = "product")
-    private List<Cart> carts;
+    @JsonIgnore
+    private List<CartItem> cartItems;
 }
