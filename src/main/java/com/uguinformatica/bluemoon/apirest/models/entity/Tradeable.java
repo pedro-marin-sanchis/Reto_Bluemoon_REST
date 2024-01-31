@@ -1,5 +1,6 @@
 package com.uguinformatica.bluemoon.apirest.models.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,6 +30,7 @@ public class Tradeable {
 
     @ManyToOne
     @JoinColumn(name = "trade_id")
+    @JsonIgnore
     private Trade trade;
 
     @ManyToOne
