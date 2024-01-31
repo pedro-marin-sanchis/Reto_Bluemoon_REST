@@ -2,6 +2,7 @@ package com.uguinformatica.bluemoon.apirest.models.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -10,7 +11,8 @@ import java.util.List;
 
 @Entity
 @Table(name = "user", schema = "public")
-@Getter @Setter
+@Getter
+@Setter
 @ToString
 public class User {
 
@@ -20,13 +22,15 @@ public class User {
     private long id;
 
     @Basic
-    @Column(name = "username")
-
+    @Column(name = "username", unique = true, nullable = false)
+    @NotEmpty(message = "No username specified")
+    @Size(min = 3, max = 50, message = "Username must be between 3 and 50 characters")
     private String username;
 
     @Basic
     @Column(name = "name")
     @NotEmpty(message = "No name specified")
+    @Size(min = 3, max = 20, message = "Name must be between 3 and 20 characters")
     private String name;
 
     @Basic
@@ -34,12 +38,14 @@ public class User {
     private String surnames;
 
     @Basic
-    @Column(name = "email")
+    @Column(name = "email", unique = true, nullable = false)
     @NotEmpty(message = "No email specified")
+    @Size(min=3, message = "Email must be greater than 3 characters")
     private String email;
 
     @Basic
     @Column(name = "address")
+    @NotEmpty(message = "No address specified")
     private String address;
 
 
@@ -57,7 +63,7 @@ public class User {
     private List<Order> orders;
 
     @OneToMany(mappedBy = "user")
-    private List<CartItem> productsInCart ;
+    private List<CartItem> productsInCart;
 
     @OneToMany(mappedBy = "user")
     private List<Trade> trades;

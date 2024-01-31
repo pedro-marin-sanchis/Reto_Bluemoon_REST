@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public class UserDAOImpl {
+public class UserDAOImpl implements UserDAO {
 
     private final EntityManager entityManager;
 
@@ -34,6 +34,16 @@ public class UserDAOImpl {
         try {
             Query query = entityManager.createQuery("from User where username = :username");
             query.setParameter("username", username);
+            return (User) query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
+    public User findByEmail(String email) {
+        try {
+            Query query = entityManager.createQuery("from User where email = :email");
+            query.setParameter("email", email);
             return (User) query.getSingleResult();
         } catch (NoResultException e) {
             return null;

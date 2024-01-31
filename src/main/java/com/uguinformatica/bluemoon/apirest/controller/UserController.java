@@ -52,23 +52,16 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-/*    @GetMapping("/{id}/cart")
-    public ResponseEntity<?> showCart(@PathVariable long id) {
-
-        User user = userService.findById(id);
-
-        if (user == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok(user.getProductsInCart());
-
-
-    }*/
-
-
     @PostMapping("/")
     public ResponseEntity<?> create(@RequestBody @Valid UserRegisterDTO user, BindingResult result) {
+
+        if (userService.findByUsername(user.username) != null) {
+            return ResponseEntity.badRequest().body("Username already exists");
+        }
+
+        if (userService.findByEmail(user.email) != null) {
+            return ResponseEntity.badRequest().body("Email already exists");
+        }
 
         if (result.hasFieldErrors()) {
             List<String> errors = result.getFieldErrors()
