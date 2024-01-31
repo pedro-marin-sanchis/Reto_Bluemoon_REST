@@ -4,6 +4,7 @@ import com.uguinformatica.bluemoon.apirest.models.dao.ProductDAOImpl;
 import com.uguinformatica.bluemoon.apirest.models.dao.SilverTypeDAOImpl;
 import com.uguinformatica.bluemoon.apirest.models.entity.Product;
 import com.uguinformatica.bluemoon.apirest.models.entity.SilverType;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -32,12 +33,12 @@ public class ProductController {
 
 
     @PostMapping("/")
-    public ResponseEntity<?> create(@RequestBody Product product, BindingResult result) {
+    public ResponseEntity<?> create(@RequestBody @Valid Product product, BindingResult result) {
 
         if (result.hasFieldErrors()) {
             List<String> errors = result.getFieldErrors()
                     .stream()
-                    .map(err -> "The field '" + err.getField() + "' " + err.getDefaultMessage()).toList();
+                    .map(err -> "Error on field '" + err.getField() + "'. " + err.getDefaultMessage()).toList();
 
             return ResponseEntity.badRequest().body(errors);
         }
@@ -58,7 +59,7 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable long id, @RequestBody Product product, BindingResult result) {
+    public ResponseEntity<?> update(@PathVariable long id, @Valid @RequestBody Product product, BindingResult result) {
         Product productFound = productService.findById(id);
 
         if (productFound == null) {
