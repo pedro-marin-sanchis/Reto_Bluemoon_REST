@@ -1,6 +1,7 @@
 package com.uguinformatica.bluemoon_api.models.dao;
 
 import com.uguinformatica.bluemoon_api.models.entity.User;
+import jakarta.persistence.NoResultException;
 import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.Query;
@@ -12,12 +13,13 @@ import java.util.List;
 @Repository
 public class UserDAOImpl {
 
-    private EntityManager entityManager;
+    private final EntityManager entityManager;
 
     @Autowired
     public UserDAOImpl(EntityManager entityManager) {
         this.entityManager = entityManager;
     }
+
 
     @Transactional
     public void save(User user) {
@@ -28,21 +30,29 @@ public class UserDAOImpl {
         return entityManager.find(User.class, id);
     }
 
+    public User findByUsername(String username) {
+        try {
+            Query query = entityManager.createQuery("from User where username = :username");
+            query.setParameter("username", username);
+            return (User) query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
 
     public List<User> findAll() {
-
-        Query query = entityManager.createQuery("from User ");
+        Query query = entityManager.createQuery("from User");
         return query.getResultList();
     }
 
     @Transactional
-
     public void update(User user) {
+        System.out.println("UserDAOImpl.update");
         entityManager.merge(user);
     }
 
     @Transactional
-
     public void delete(long id) {
         User user = findById(id);
         entityManager.remove(user);

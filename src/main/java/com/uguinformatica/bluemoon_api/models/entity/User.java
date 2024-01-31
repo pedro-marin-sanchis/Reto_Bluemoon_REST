@@ -1,27 +1,33 @@
 package com.uguinformatica.bluemoon_api.models.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.List;
 
 @Entity
 @Table(name = "user", schema = "public")
 @Getter @Setter
+@ToString
 public class User {
+
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id")
-    private int id;
+    private long id;
 
     @Basic
     @Column(name = "username")
+
     private String username;
 
     @Basic
     @Column(name = "name")
+    @NotEmpty(message = "No name specified")
     private String name;
 
     @Basic
@@ -30,20 +36,22 @@ public class User {
 
     @Basic
     @Column(name = "email")
+    @NotEmpty(message = "No email specified")
     private String email;
 
     @Basic
     @Column(name = "address")
     private String address;
 
-    @Basic
-    @Column(name = "balance")
-    private double balance;
 
     @Basic
     @Column(name = "password_hash")
-    @JsonIgnore
+    @NotEmpty(message = "No password specified")
     private String password;
+
+    @Basic
+    @Column(name = "balance")
+    private double balance;
 
     @OneToMany(mappedBy = "user")
     private List<Order> orders;
