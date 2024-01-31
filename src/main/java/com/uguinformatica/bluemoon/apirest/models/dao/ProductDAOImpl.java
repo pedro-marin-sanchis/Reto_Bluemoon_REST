@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Repository
 public class ProductDAOImpl implements ProductDAO {
     private EntityManager entityManager;
@@ -26,9 +28,9 @@ public class ProductDAOImpl implements ProductDAO {
         return entityManager.find(Product.class, id);
     }
 
-    public Product[] findAll() {
+    public List<Product> findAll() {
         Query query = entityManager.createQuery("from Product ");
-        return (Product[]) query.getResultList().toArray();
+        return query.getResultList();
     }
 
     @Transactional
@@ -41,7 +43,8 @@ public class ProductDAOImpl implements ProductDAO {
 
     public void delete(long id) {
         Product product = findById(id);
-        entityManager.remove(product);
+        product.setDisabled(true);
+        entityManager.merge(product);
     }
 
 }

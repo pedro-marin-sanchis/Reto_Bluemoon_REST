@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -15,7 +16,7 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id")
-    private int id;
+    private long id;
 
     @Basic
     @Column(name = "name")
@@ -33,7 +34,13 @@ public class Product {
     @Column(name = "img")
     private String img;
 
+    @Basic
+    @Column(name = "disabled", columnDefinition = "boolean default false")
+    private boolean disabled;
+
     @OneToMany(mappedBy = "product")
     Set<ProductOrder> orders;
 
+    @OneToMany(mappedBy = "product")
+    private List<Cart> carts;
 }
