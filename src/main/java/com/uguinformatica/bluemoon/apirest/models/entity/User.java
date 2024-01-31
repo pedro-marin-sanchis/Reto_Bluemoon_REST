@@ -53,6 +53,7 @@ public class User {
     private double balance;
 
     @OneToMany(mappedBy = "user")
+
     private List<Order> orders;
 
     @OneToMany(mappedBy = "user")

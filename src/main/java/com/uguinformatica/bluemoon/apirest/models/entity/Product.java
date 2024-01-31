@@ -40,6 +40,7 @@ public class Product {
     private boolean disabled;
 
     @OneToMany(mappedBy = "product")
+    @JsonIgnore
     Set<ProductOrder> orders;
 
     @OneToMany(mappedBy = "product")

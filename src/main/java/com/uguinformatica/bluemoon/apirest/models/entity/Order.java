@@ -1,5 +1,6 @@
 package com.uguinformatica.bluemoon.apirest.models.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,12 +12,11 @@ import java.util.Set;
 @Table(name = "order", schema = "public")
 @Getter
 @Setter
-
 public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id")
-    private int id;
+    private long id;
 
     @Basic
     @Column(name = "date")
@@ -36,6 +36,7 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
     @OneToMany(mappedBy = "order")

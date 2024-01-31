@@ -2,6 +2,7 @@ package com.uguinformatica.bluemoon.apirest.models.dto;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
+import lombok.Getter;
 
 public class UserRegisterDTO {
     @Size(min = 4, message = "Username size must be greater than 4")

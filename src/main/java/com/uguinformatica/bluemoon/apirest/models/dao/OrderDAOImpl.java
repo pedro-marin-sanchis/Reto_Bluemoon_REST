@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Repository
 public class OrderDAOImpl implements OrderDAO {
 
@@ -26,9 +28,9 @@ public class OrderDAOImpl implements OrderDAO {
         return entityManager.find(Order.class, id);
     }
 
-    public Order[] findAll() {
+    public List<Order> findAll() {
         Query query = entityManager.createQuery("from Order");
-        return (Order[]) query.getResultList().toArray();
+        return query.getResultList();
     }
     @Transactional
 
