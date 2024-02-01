@@ -72,9 +72,9 @@ public class ProductController {
 
         }
 
-        productFound.setId(id);
+        product.setId(id);
 
-        productService.update(productFound);
+        productService.update(product);
         return ResponseEntity.ok(product);
     }
 }
