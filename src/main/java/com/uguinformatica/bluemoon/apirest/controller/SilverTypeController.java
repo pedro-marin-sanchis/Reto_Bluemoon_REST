@@ -67,6 +67,8 @@ public class SilverTypeController {
         }
 
         silverTypeFound.setId(id);
+        silverTypeFound.setName(silverType.getName());
+        silverTypeFound.setCurrentPrice(silverType.getCurrentPrice());
 
         silverTypeService.update(silverTypeFound);
         return ResponseEntity.ok(silverType);
