@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface TradeableDAO {
 
-    void save(Tradeable tradeable);
+    Tradeable save(Tradeable tradeable);
 
     Tradeable findById(long id);
 

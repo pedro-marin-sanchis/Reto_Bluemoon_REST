@@ -186,7 +186,7 @@ public class UserController {
 
     }
 
-    @PatchMapping("/{id}/cart-items/{productId}")
+    @PutMapping("/{id}/cart-items/{productId}")
     public ResponseEntity<?> updateCartItem(
             @PathVariable long id,
             @PathVariable long productId,

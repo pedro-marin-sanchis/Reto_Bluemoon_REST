@@ -19,8 +19,10 @@ public class TradeableDAOImpl implements TradeableDAO {
     }
     @Transactional
 
-    public void save(Tradeable tradeable) {
+    public Tradeable save(Tradeable tradeable) {
         entityManager.persist(tradeable);
+        entityManager.flush();
+        return tradeable;
     }
 
     public Tradeable findById(long id) {

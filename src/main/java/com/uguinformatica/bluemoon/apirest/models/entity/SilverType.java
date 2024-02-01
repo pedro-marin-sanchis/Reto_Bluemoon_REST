@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.Set;
 
@@ -14,7 +15,7 @@ import java.util.Set;
 @Table(name = "silver_type", schema = "public")
 @Getter
 @Setter
-
+@ToString
 public class SilverType {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id

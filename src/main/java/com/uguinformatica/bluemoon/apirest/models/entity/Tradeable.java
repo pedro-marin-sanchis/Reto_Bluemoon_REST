@@ -2,6 +2,8 @@ package com.uguinformatica.bluemoon.apirest.models.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,6 +20,7 @@ public class Tradeable {
 
     @Basic
     @Column(name = "weight")
+    @DecimalMin(value = "0.0", inclusive = false, message = "The weight must be greater than 0")
     private double weight;
 
     @Basic
@@ -35,6 +38,7 @@ public class Tradeable {
 
     @ManyToOne
     @JoinColumn(name = "silver_type_id")
+    @NotNull(message = "The silver type must be valid")
     private SilverType silverType;
 
 }
