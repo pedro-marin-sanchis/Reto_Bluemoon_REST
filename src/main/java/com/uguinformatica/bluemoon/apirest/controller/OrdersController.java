@@ -72,7 +72,6 @@ public class OrdersController {
             productOrderKey.setOrderId(order.getId());
             productOrderKey.setProductId(cartItem.getProduct().getId());
 
-            System.out.println(productOrder);
 
             productOrder.setId(productOrderKey);
             productOrderService.save(productOrder);

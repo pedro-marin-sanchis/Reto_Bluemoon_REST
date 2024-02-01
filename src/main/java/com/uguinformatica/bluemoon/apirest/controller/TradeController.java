@@ -60,7 +60,6 @@ public class TradeController {
 
         trade.setUser(userService.findById(newTrade.userId));
 
-        System.out.println(newTrade);
 
         trade.setTradeables(newTrade.tradeables.stream().map((tradeable) -> {
             Tradeable newTradeable = new Tradeable();

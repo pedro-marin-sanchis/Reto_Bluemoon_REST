@@ -60,7 +60,6 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
 
-        System.out.println(user.getProductsInCart());
 
         return ResponseEntity.ok(user);
     }
