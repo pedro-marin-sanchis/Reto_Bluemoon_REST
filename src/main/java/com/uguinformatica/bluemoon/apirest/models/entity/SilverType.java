@@ -34,6 +34,7 @@ public class SilverType {
     private boolean disabled;
 
     @OneToMany(mappedBy = "silverType")
+    @JsonIgnore
     private Set<Tradeable> tradeables;
 
 

@@ -1,9 +1,15 @@
 package com.uguinformatica.bluemoon.apirest.controller;
 
+import com.uguinformatica.bluemoon.apirest.models.dao.CartDAOImpl;
+import com.uguinformatica.bluemoon.apirest.models.dao.ProductDAOImpl;
 import com.uguinformatica.bluemoon.apirest.models.dao.UserDAOImpl;
+import com.uguinformatica.bluemoon.apirest.models.dto.CartAddItem;
+import com.uguinformatica.bluemoon.apirest.models.dto.CartItemUpdate;
 import com.uguinformatica.bluemoon.apirest.models.dto.UserRegisterDTO;
+import com.uguinformatica.bluemoon.apirest.models.entity.CartItem;
 import com.uguinformatica.bluemoon.apirest.models.entity.User;
 import com.uguinformatica.bluemoon.apirest.mappers.UserRegisterDtoMapper;
+import com.uguinformatica.bluemoon.apirest.models.entity.keys.CartKey;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +24,12 @@ public class UserController {
 
     @Autowired
     private UserDAOImpl userService;
+
+    @Autowired
+    private ProductDAOImpl productService;
+
+    @Autowired
+    private CartDAOImpl cartService;
 
     @GetMapping("/")
     public ResponseEntity<List<User>> showAll() {
@@ -114,5 +126,123 @@ public class UserController {
 
         userService.update(user);
         return ResponseEntity.ok(user);
+    }
+
+    @GetMapping("/{id}/cart-items")
+    public ResponseEntity<?> showCartItems(@PathVariable long id) {
+
+        User user = userService.findById(id);
+
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(user.getProductsInCart());
+
+    }
+
+    @PostMapping("/{id}/cart-items")
+    public ResponseEntity<?> addToCart(@PathVariable long id, @RequestBody @Valid CartAddItem cartAddData, BindingResult result) {
+
+        User user = userService.findById(id);
+
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (result.hasFieldErrors()) {
+            List<String> errors = result.getFieldErrors()
+                    .stream()
+                    .map(err -> "The field '" + err.getField() + "' " + err.getDefaultMessage()).toList();
+
+            return ResponseEntity.badRequest().body(errors);
+        }
+
+        CartItem cartItem = new CartItem();
+
+        CartKey cartKey = new CartKey(cartAddData.productId, user.getId());
+
+
+        cartItem.setId(cartKey);
+
+        cartItem.setQuantity(cartAddData.quantity);
+        cartItem.setProduct(productService.findById(cartAddData.productId));
+        cartItem.setUser(user);
+
+        cartService.save(cartItem);
+
+        return ResponseEntity.ok(cartItem);
+    }
+
+    @GetMapping("/{id}/cart-items/{productId}")
+    public ResponseEntity<?> showCartItem(@PathVariable long id, @PathVariable long productId) {
+
+        User user = userService.findById(id);
+
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        CartKey cartKey = new CartKey(productId, user.getId());
+
+        CartItem cartItem = cartService.findByKey(cartKey);
+
+        if (cartItem == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(cartItem);
+
+    }
+
+    @PatchMapping("/{id}/cart-items/{productId}")
+    public ResponseEntity<?> updateCartItem(
+            @PathVariable long id,
+            @PathVariable long productId,
+            @RequestBody @Valid CartItemUpdate cartItemUpdate,
+            BindingResult result
+    ) {
+
+        User user = userService.findById(id);
+
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (result.hasFieldErrors()) {
+            List<String> errors = result.getFieldErrors()
+                    .stream()
+                    .map(err -> "The field '" + err.getField() + "' " + err.getDefaultMessage()).toList();
+
+            return ResponseEntity.badRequest().body(errors);
+        }
+
+        CartKey cartKey = new CartKey(productId, user.getId());
+
+        CartItem cartItem = cartService.findByKey(cartKey);
+
+        if (cartItem == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        cartItem.setQuantity(cartItemUpdate.quantity);
+
+        cartService.update(cartItem);
+
+        return ResponseEntity.ok(cartItem);
+    }
+
+
+    @DeleteMapping("/{id}/cart-items/{productId}")
+    public ResponseEntity<?> deleteCartItem(@PathVariable long id, @PathVariable long productId) {
+        User user = userService.findById(id);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        CartKey cartKey = new CartKey(productId, user.getId());
+
+        cartService.delete(cartService.findByKey(cartKey));
+        return ResponseEntity.noContent().build();
     }
 }
