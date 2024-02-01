@@ -13,7 +13,10 @@ import com.uguinformatica.bluemoon.apirest.mappers.UserRegisterDtoMapper;
 import com.uguinformatica.bluemoon.apirest.models.entity.keys.CartKey;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,6 +35,9 @@ public class UserController {
     @Autowired
     private CartDAOImpl cartService;
 
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     @GetMapping("/")
     public ResponseEntity<List<User>> showAll() {
         return ResponseEntity.ok(userService.findAll());
@@ -84,6 +90,8 @@ public class UserController {
         }
 
         User userEntity = UserRegisterDtoMapper.map(user);
+
+        userEntity.setPassword(passwordEncoder.encode(user.password));
 
         userService.save(userEntity);
         return ResponseEntity.ok(user);
