@@ -6,6 +6,8 @@ import com.uguinformatica.bluemoon.apirest.models.dao.TradeDAOImpl;
 import com.uguinformatica.bluemoon.apirest.models.dao.TradeableDAOImpl;
 import com.uguinformatica.bluemoon.apirest.models.dao.UserDAOImpl;
 import com.uguinformatica.bluemoon.apirest.models.dto.TradeCreateEntity;
+import com.uguinformatica.bluemoon.apirest.models.dto.TradeableCreateEntity;
+import com.uguinformatica.bluemoon.apirest.models.dto.TradeUpdateEntity;
 import com.uguinformatica.bluemoon.apirest.models.dto.TradeableUpdateEntity;
 import com.uguinformatica.bluemoon.apirest.models.entity.Trade;
 import com.uguinformatica.bluemoon.apirest.models.entity.Tradeable;
@@ -16,7 +18,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
-import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
@@ -66,11 +67,9 @@ public class TradeController {
             newTradeable.setWeight(tradeable.weight);
             newTradeable.setDescription(tradeable.description);
 
-            System.out.println(tradeable.silverTypeId);
             newTradeable.setSilverType(silverTypeService.findById(tradeable.silverTypeId));
 
-            System.out.println(silverTypeService.findById(tradeable.silverTypeId));
-
+            newTradeable.setSellPrice(tradeable.weight * newTradeable.getSilverType().getCurrentPrice());
 
             return tradeableService.save(newTradeable);
 
@@ -81,7 +80,7 @@ public class TradeController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@RequestBody @Valid TradeableUpdateEntity newTrade, BindingResult result, @PathVariable long id) {
+    public ResponseEntity<?> update(@RequestBody @Valid TradeUpdateEntity newTrade, BindingResult result, @PathVariable long id) {
 
         if (result.hasFieldErrors()) {
             return ControllerValidationErrors.generateFieldErrors(result);
@@ -112,6 +111,111 @@ public class TradeController {
         return ResponseEntity.ok().build();
     }
 
+
+    @GetMapping("/{id}/tradeables")
+    public ResponseEntity<?> showTradeables(@PathVariable long id) {
+        Trade trade = tradeService.findById(id);
+
+        if (trade == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(trade.getTradeables());
+    }
+
+    @GetMapping("/{id}/tradeables/{tradeableId}")
+    public ResponseEntity<?> showTradeable(@PathVariable long id, @PathVariable long tradeableId) {
+        Trade trade = tradeService.findById(id);
+
+        if (trade == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Tradeable tradeable = tradeableService.findById(tradeableId);
+
+        if (tradeable == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(tradeable);
+    }
+
+    @PostMapping("/{id}/tradeables")
+    public ResponseEntity<?> createTradeable(@RequestBody @Valid TradeableCreateEntity newTradeable, BindingResult result, @PathVariable long id) {
+        if (result.hasFieldErrors()) {
+            return ControllerValidationErrors.generateFieldErrors(result);
+        }
+
+        Trade trade = tradeService.findById(id);
+
+        if (trade == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Tradeable tradeable = new Tradeable();
+
+        tradeable.setWeight(newTradeable.weight);
+        tradeable.setDescription(newTradeable.description);
+        tradeable.setSilverType(silverTypeService.findById(newTradeable.silverTypeId));
+
+        tradeable.setSellPrice(tradeable.getWeight() * tradeable.getSilverType().getCurrentPrice());
+
+        tradeable.setTrade(trade);
+
+        tradeableService.save(tradeable);
+
+        return ResponseEntity.ok(tradeable);
+
+    }
+
+    @DeleteMapping("/{id}/tradeables/{tradeableId}")
+    public ResponseEntity<?> deleteTradeable(@PathVariable long id, @PathVariable long tradeableId) {
+        Trade trade = tradeService.findById(id);
+
+        if (trade == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Tradeable tradeable = tradeableService.findById(tradeableId);
+
+        if (tradeable == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        tradeableService.delete(tradeableId);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/{id}/tradeables/{tradeableId}")
+    public ResponseEntity<?> updateTradeable(@RequestBody @Valid TradeableUpdateEntity newTradeable, BindingResult result, @PathVariable long id, @PathVariable long tradeableId) {
+        if (result.hasFieldErrors()) {
+            return ControllerValidationErrors.generateFieldErrors(result);
+        }
+
+        Trade trade = tradeService.findById(id);
+
+        if (trade == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Tradeable tradeable = tradeableService.findById(tradeableId);
+
+        if (tradeable == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        tradeable.setWeight(newTradeable.weight);
+        tradeable.setDescription(newTradeable.description);
+        tradeable.setSilverType(silverTypeService.findById(newTradeable.silverTypeId));
+        tradeable.setSellPrice(tradeable.getWeight() * tradeable.getSilverType().getCurrentPrice());
+        tradeable.setTrade(trade);
+
+        tradeableService.save(tradeable);
+
+        return ResponseEntity.ok(tradeable);
+
+    }
 
 
 }

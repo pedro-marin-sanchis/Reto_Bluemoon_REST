@@ -39,7 +39,6 @@ public class Trade {
     private User user;
 
     @OneToMany(mappedBy = "trade")
-    @JsonIgnore
     private Set<Tradeable> tradeables;
 
 }
