@@ -28,7 +28,54 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests( authz -> authz
                         .requestMatchers(HttpMethod.POST,"/api/login").permitAll()
-                        .anyRequest().authenticated())
+
+                        .requestMatchers(HttpMethod.GET,"/api/users").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.GET,"/api/users/*").authenticated()
+                        .requestMatchers(HttpMethod.PUT,"/api/users/*").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.POST,"/api/users").permitAll()
+                        .requestMatchers(HttpMethod.DELETE,"/api/users/*").hasAuthority("ADMIN")
+
+                        .requestMatchers(HttpMethod.GET,"/api/users/me").authenticated()
+
+                        .requestMatchers(HttpMethod.GET, "/api/users/*/cart-items").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/users/*/cart-items/*").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/users/*/cart-items/*").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/*/cart-items/*").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/users/*/cart-items").authenticated()
+
+                        .requestMatchers(HttpMethod.GET,"/api/products").authenticated()
+                        .requestMatchers(HttpMethod.GET,"/api/products/*").authenticated()
+                        .requestMatchers(HttpMethod.POST,"/api/products").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.PUT,"/api/products/*").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE,"/api/products/*").hasAuthority("ADMIN")
+
+                        .requestMatchers(HttpMethod.POST, "/api/orders").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/orders").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/orders/*").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/orders/*").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/orders/*").hasAuthority("ADMIN")
+
+                        .requestMatchers(HttpMethod.GET, "/api/silver-types").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/silver-types/*").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/silver-types").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/silver-types/*").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/silver-types/*").hasAuthority("ADMIN")
+
+                        .requestMatchers(HttpMethod.GET, "/api/trades").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/trades/*").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/trades").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/trades/*").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/trades/*").hasAuthority("ADMIN")
+
+                        .requestMatchers(HttpMethod.GET, "/api/trades/*/tradeables").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/trades/*/tradeables/*").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/trades/*/tradeables").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/trades/*/tradeables/*").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/trades/*/tradeables/*").hasAuthority("ADMIN")
+
+                        .anyRequest().hasAuthority("ADMIN")
+
+                )
                 .addFilterAfter(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

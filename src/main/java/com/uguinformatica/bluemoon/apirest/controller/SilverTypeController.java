@@ -18,7 +18,7 @@ public class SilverTypeController {
     @Autowired
     private SilverTypeDAOImpl silverTypeService;
 
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<List<?>> showAll() {
         return ResponseEntity.ok(silverTypeService.findAll());
     }
@@ -31,7 +31,7 @@ public class SilverTypeController {
     }
 
 
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity<?> create(@RequestBody @Valid SilverType silverType, BindingResult result) {
 
         if (result.hasFieldErrors()) {

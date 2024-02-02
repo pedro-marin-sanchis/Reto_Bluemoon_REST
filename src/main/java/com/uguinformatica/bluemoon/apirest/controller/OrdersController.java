@@ -34,7 +34,7 @@ public class OrdersController {
     @Autowired
     private ProductOrderDAOImpl productOrderService;
 
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<List<?>> showAll() {
         return ResponseEntity.ok(ordersService.findAll());
     }
@@ -47,7 +47,7 @@ public class OrdersController {
     }
 
 
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity<?> create(@RequestBody OrderCreateDTO orderCreate, BindingResult result) {
 
         if (result.hasFieldErrors()) {

@@ -15,6 +15,8 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
@@ -38,13 +40,20 @@ public class UserController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-    @GetMapping("/")
-    public ResponseEntity<List<User>> showAll() {
+    @GetMapping("")
+    public ResponseEntity<List<User>> showAll(@RequestHeader("Authorization") String token) {
         return ResponseEntity.ok(userService.findAll());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> show(@PathVariable String id) {
+
+        String requestUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        if (id.equals("me")) {
+            User user = userService.findByUsername(requestUsername);
+            return ResponseEntity.ok(user);
+        }
 
 
         User user = null;
@@ -66,11 +75,20 @@ public class UserController {
             return ResponseEntity.notFound().build();
         }
 
+        /*String requestUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        List<String> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream().map(auth -> auth.getAuthority()).toList();
+
+
+        System.out.println(requestUsername);
+        System.out.println(authorities);
+        if (!requestUsername.equals(user.getUsername()) && !authorities.contains("ADMIN")) {
+            return ResponseEntity.status(403).build();
+        }*/
 
         return ResponseEntity.ok(user);
     }
 
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity<?> create(@RequestBody @Valid UserRegisterDTO user, BindingResult result) {
 
         if (userService.findByUsername(user.username) != null) {

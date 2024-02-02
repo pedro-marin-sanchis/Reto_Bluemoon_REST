@@ -20,7 +20,7 @@ public class ProductController {
     @Autowired
     private ProductDAOImpl productService;
 
-    @GetMapping("/")
+    @GetMapping("")
     public ResponseEntity<List<?>> showAll() {
         return ResponseEntity.ok(productService.findAll());
     }
@@ -33,7 +33,7 @@ public class ProductController {
     }
 
 
-    @PostMapping("/")
+    @PostMapping("")
     public ResponseEntity<?> create(@RequestBody @Valid Product product, BindingResult result) {
 
         if (result.hasFieldErrors()) {
