@@ -13,11 +13,9 @@ import com.uguinformatica.bluemoon.apirest.mappers.UserRegisterDtoMapper;
 import com.uguinformatica.bluemoon.apirest.models.entity.keys.CartKey;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -40,55 +38,37 @@ public class UserController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("")
-    public ResponseEntity<List<User>> showAll(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<List<User>> showAll() {
         return ResponseEntity.ok(userService.findAll());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<?> show(@PathVariable String id) {
+    @GetMapping("/{username}")
+    @PreAuthorize("hasAuthority('ADMIN') or #username == principal ") // or #username == principal
+    public ResponseEntity<?> show(@PathVariable String username) {
 
-        String requestUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+        System.out.println(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
 
-        if (id.equals("me")) {
+        /*if (username.equals("me")) {
+            String requestUsername = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
             User user = userService.findByUsername(requestUsername);
             return ResponseEntity.ok(user);
-        }
-
+        }*/
 
         User user = null;
 
-        try {
-            long idLong = Long.parseLong(id);
-
-            user = userService.findById(idLong);
-
-        } catch (NumberFormatException e) {
-            //Do nothing
-        } finally {
-            if (user == null) {
-                user = userService.findByUsername(id);
-            }
-        }
-
+        user = userService.findByUsername(username);
         if (user == null) {
             return ResponseEntity.notFound().build();
         }
-
-        /*String requestUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-        List<String> authorities = SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream().map(auth -> auth.getAuthority()).toList();
-
-
-        System.out.println(requestUsername);
-        System.out.println(authorities);
-        if (!requestUsername.equals(user.getUsername()) && !authorities.contains("ADMIN")) {
-            return ResponseEntity.status(403).build();
-        }*/
 
         return ResponseEntity.ok(user);
     }
 
     @PostMapping("")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<?> create(@RequestBody @Valid UserRegisterDTO user, BindingResult result) {
 
         if (userService.findByUsername(user.username) != null) {
@@ -115,19 +95,21 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable long id) {
-        User user = userService.findById(id);
+    @DeleteMapping("/{username}")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<?> delete(@PathVariable String username) {
+        User user = userService.findByUsername(username);
         if (user == null) {
             return ResponseEntity.notFound().build();
         }
-        userService.delete(id);
+        userService.delete(user.getId());
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable long id, @RequestBody @Valid User user, BindingResult result) {
-        User userFound = userService.findById(id);
+    @PutMapping("/{username}")
+    @PreAuthorize("hasAuthority('ADMIN') or #username == principal")
+    public ResponseEntity<?> update(@PathVariable String username, @RequestBody @Valid User user, BindingResult result) {
+        User userFound = userService.findByUsername(username);
 
         if (userFound == null) {
             return ResponseEntity.notFound().build();
@@ -138,17 +120,16 @@ public class UserController {
 
         }
 
-        user.setId(id);
+        user.setId(userFound.getId());
 
         userService.update(user);
         return ResponseEntity.ok(user);
     }
 
-    @GetMapping("/{id}/cart-items")
-    public ResponseEntity<?> showCartItems(@PathVariable long id) {
-
-        User user = userService.findById(id);
-
+    @GetMapping("/{username}/cart-items")
+    @PreAuthorize("hasAuthority('ADMIN') or #username == principal")
+    public ResponseEntity<?> showCartItems(@PathVariable String username) {
+        User user = userService.findByUsername(username);
         if (user == null) {
             return ResponseEntity.notFound().build();
         }
@@ -157,10 +138,11 @@ public class UserController {
 
     }
 
-    @PostMapping("/{id}/cart-items")
-    public ResponseEntity<?> addToCart(@PathVariable long id, @RequestBody @Valid CartAddItem cartAddData, BindingResult result) {
+    @PostMapping("/{username}/cart-items")
+    @PreAuthorize("hasAuthority('ADMIN') or #username == principal")
+    public ResponseEntity<?> addToCart(@PathVariable String username, @RequestBody @Valid CartAddItem cartAddData, BindingResult result) {
 
-        User user = userService.findById(id);
+        User user = userService.findByUsername(username);
 
         if (user == null) {
             return ResponseEntity.notFound().build();
@@ -191,9 +173,10 @@ public class UserController {
     }
 
     @GetMapping("/{id}/cart-items/{productId}")
-    public ResponseEntity<?> showCartItem(@PathVariable long id, @PathVariable long productId) {
+    @PreAuthorize("hasAuthority('ADMIN') or #username == principal")
+    public ResponseEntity<?> showCartItem(@PathVariable String username, @PathVariable long productId) {
 
-        User user = userService.findById(id);
+        User user = userService.findByUsername(username);
 
         if (user == null) {
             return ResponseEntity.notFound().build();
@@ -212,14 +195,15 @@ public class UserController {
     }
 
     @PutMapping("/{id}/cart-items/{productId}")
+    @PreAuthorize("hasAuthority('ADMIN') or #username == principal")
     public ResponseEntity<?> updateCartItem(
-            @PathVariable long id,
+            @PathVariable String username,
             @PathVariable long productId,
             @RequestBody @Valid CartItemUpdate cartItemUpdate,
             BindingResult result
     ) {
 
-        User user = userService.findById(id);
+        User user = userService.findByUsername(username);
 
         if (user == null) {
             return ResponseEntity.notFound().build();
@@ -250,8 +234,9 @@ public class UserController {
 
 
     @DeleteMapping("/{id}/cart-items/{productId}")
-    public ResponseEntity<?> deleteCartItem(@PathVariable long id, @PathVariable long productId) {
-        User user = userService.findById(id);
+    @PreAuthorize("hasAuthority('ADMIN') or #username == principal")
+    public ResponseEntity<?> deleteCartItem(@PathVariable String username, @PathVariable long productId) {
+        User user = userService.findByUsername(username);
         if (user == null) {
             return ResponseEntity.notFound().build();
         }

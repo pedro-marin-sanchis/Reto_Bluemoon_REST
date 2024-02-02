@@ -48,6 +48,7 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
 
         SecurityContextHolder.getContext().setAuthentication(auth);
 
+
     }
 
     private boolean isJWTValid(HttpServletRequest request, HttpServletResponse res) {

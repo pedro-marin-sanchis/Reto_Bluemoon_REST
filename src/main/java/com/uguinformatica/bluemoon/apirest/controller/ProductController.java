@@ -8,6 +8,8 @@ import com.uguinformatica.bluemoon.apirest.models.entity.SilverType;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PostFilter;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,11 +23,13 @@ public class ProductController {
     private ProductDAOImpl productService;
 
     @GetMapping("")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<?>> showAll() {
         return ResponseEntity.ok(productService.findAll());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> show(@PathVariable long id) {
         Product product = productService.findById(id);
 
@@ -34,6 +38,7 @@ public class ProductController {
 
 
     @PostMapping("")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> create(@RequestBody @Valid Product product, BindingResult result) {
 
         if (result.hasFieldErrors()) {
@@ -50,6 +55,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> delete(@PathVariable long id) {
         Product product = productService.findById(id);
         if (product == null) {
@@ -60,6 +66,7 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> update(@PathVariable long id, @Valid @RequestBody Product product, BindingResult result) {
         Product productFound = productService.findById(id);
 

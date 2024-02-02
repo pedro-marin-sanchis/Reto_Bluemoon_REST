@@ -14,6 +14,7 @@ import com.uguinformatica.bluemoon.apirest.models.entity.Tradeable;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,11 +34,13 @@ public class TradeController {
     private SilverTypeDAOImpl silverTypeService;
 
     @GetMapping("")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> showAll() {
         return ResponseEntity.ok(tradeService.findAll());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> show(@PathVariable long id) {
 
         Trade trade = tradeService.findById(id);
@@ -50,6 +53,7 @@ public class TradeController {
     }
 
     @PostMapping("")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> create(@RequestBody @Valid TradeCreateEntity newTrade, BindingResult result) {
         if (result.hasFieldErrors()) {
             return ControllerValidationErrors.generateFieldErrors(result);
@@ -79,6 +83,7 @@ public class TradeController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> update(@RequestBody @Valid TradeUpdateEntity newTrade, BindingResult result, @PathVariable long id) {
 
         if (result.hasFieldErrors()) {
@@ -98,6 +103,7 @@ public class TradeController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> delete(@PathVariable long id) {
         Trade trade = tradeService.findById(id);
 
@@ -112,6 +118,7 @@ public class TradeController {
 
 
     @GetMapping("/{id}/tradeables")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> showTradeables(@PathVariable long id) {
         Trade trade = tradeService.findById(id);
 
@@ -123,6 +130,7 @@ public class TradeController {
     }
 
     @GetMapping("/{id}/tradeables/{tradeableId}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> showTradeable(@PathVariable long id, @PathVariable long tradeableId) {
         Trade trade = tradeService.findById(id);
 
@@ -140,6 +148,7 @@ public class TradeController {
     }
 
     @PostMapping("/{id}/tradeables")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> createTradeable(@RequestBody @Valid TradeableCreateEntity newTradeable, BindingResult result, @PathVariable long id) {
         if (result.hasFieldErrors()) {
             return ControllerValidationErrors.generateFieldErrors(result);
@@ -168,6 +177,7 @@ public class TradeController {
     }
 
     @DeleteMapping("/{id}/tradeables/{tradeableId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> deleteTradeable(@PathVariable long id, @PathVariable long tradeableId) {
         Trade trade = tradeService.findById(id);
 
@@ -187,6 +197,7 @@ public class TradeController {
     }
 
     @PutMapping("/{id}/tradeables/{tradeableId}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> updateTradeable(@RequestBody @Valid TradeableUpdateEntity newTradeable, BindingResult result, @PathVariable long id, @PathVariable long tradeableId) {
         if (result.hasFieldErrors()) {
             return ControllerValidationErrors.generateFieldErrors(result);

@@ -10,6 +10,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -34,6 +35,7 @@ public class SesionController {
     private JWTAuthtenticationConfig authtenticationConfig;
 
     @PostMapping("/login")
+    @PreAuthorize("isAnonymous()")
     public ResponseEntity<?> login(@RequestBody @Valid LoginPost body, BindingResult result) {
 
         if (result.hasFieldErrors()) {

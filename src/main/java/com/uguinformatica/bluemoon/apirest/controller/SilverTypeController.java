@@ -6,6 +6,7 @@ import com.uguinformatica.bluemoon.apirest.models.entity.SilverType;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,11 +20,13 @@ public class SilverTypeController {
     private SilverTypeDAOImpl silverTypeService;
 
     @GetMapping("")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<?>> showAll() {
         return ResponseEntity.ok(silverTypeService.findAll());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> show(@PathVariable long id) {
         SilverType silverType = silverTypeService.findById(id);
 
@@ -32,6 +35,7 @@ public class SilverTypeController {
 
 
     @PostMapping("")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> create(@RequestBody @Valid SilverType silverType, BindingResult result) {
 
         if (result.hasFieldErrors()) {
@@ -45,6 +49,7 @@ public class SilverTypeController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> delete(@PathVariable long id) {
         SilverType silverType = silverTypeService.findById(id);
         if (silverType == null) {
@@ -55,6 +60,7 @@ public class SilverTypeController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> update(@PathVariable long id, @RequestBody @Valid SilverType silverType, BindingResult result) {
         SilverType silverTypeFound = silverTypeService.findById(id);
 

@@ -14,6 +14,7 @@ import com.uguinformatica.bluemoon.apirest.models.entity.keys.ProductOrderKey;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,11 +36,13 @@ public class OrdersController {
     private ProductOrderDAOImpl productOrderService;
 
     @GetMapping("")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<?>> showAll() {
         return ResponseEntity.ok(ordersService.findAll());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> show(@PathVariable long id) {
         Order order = ordersService.findById(id);
 
@@ -48,6 +51,7 @@ public class OrdersController {
 
 
     @PostMapping("")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> create(@RequestBody OrderCreateDTO orderCreate, BindingResult result) {
 
         if (result.hasFieldErrors()) {
@@ -86,6 +90,7 @@ public class OrdersController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> delete(@PathVariable long id) {
         Order order = ordersService.findById(id);
         if (order == null) {
@@ -96,6 +101,7 @@ public class OrdersController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<?> update(@PathVariable long id, @RequestBody Order order, BindingResult result) {
         Order orderFound = ordersService.findById(id);
 
