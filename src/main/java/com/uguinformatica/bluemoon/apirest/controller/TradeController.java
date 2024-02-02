@@ -34,13 +34,13 @@ public class TradeController {
     private SilverTypeDAOImpl silverTypeService;
 
     @GetMapping("")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<?> showAll() {
         return ResponseEntity.ok(tradeService.findAll());
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     public ResponseEntity<?> show(@PathVariable long id) {
 
         Trade trade = tradeService.findById(id);

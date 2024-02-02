@@ -6,8 +6,10 @@ import com.uguinformatica.bluemoon.apirest.models.dao.ProductDAOImpl;
 import com.uguinformatica.bluemoon.apirest.models.dao.UserDAOImpl;
 import com.uguinformatica.bluemoon.apirest.models.dto.CartAddItem;
 import com.uguinformatica.bluemoon.apirest.models.dto.CartItemUpdate;
+import com.uguinformatica.bluemoon.apirest.models.dto.OrderCreateDTO;
 import com.uguinformatica.bluemoon.apirest.models.dto.UserRegisterDTO;
 import com.uguinformatica.bluemoon.apirest.models.entity.CartItem;
+import com.uguinformatica.bluemoon.apirest.models.entity.Order;
 import com.uguinformatica.bluemoon.apirest.models.entity.User;
 import com.uguinformatica.bluemoon.apirest.mappers.UserRegisterDtoMapper;
 import com.uguinformatica.bluemoon.apirest.models.entity.keys.CartKey;
@@ -126,6 +128,8 @@ public class UserController {
         return ResponseEntity.ok(user);
     }
 
+
+    // ----------------- Cart -----------------
     @GetMapping("/{username}/cart-items")
     @PreAuthorize("hasAuthority('ADMIN') or #username == principal")
     public ResponseEntity<?> showCartItems(@PathVariable String username) {
@@ -172,7 +176,7 @@ public class UserController {
         return ResponseEntity.ok(cartItem);
     }
 
-    @GetMapping("/{id}/cart-items/{productId}")
+    @GetMapping("/{username}/cart-items/{productId}")
     @PreAuthorize("hasAuthority('ADMIN') or #username == principal")
     public ResponseEntity<?> showCartItem(@PathVariable String username, @PathVariable long productId) {
 
@@ -194,7 +198,7 @@ public class UserController {
 
     }
 
-    @PutMapping("/{id}/cart-items/{productId}")
+    @PutMapping("/{username}/cart-items/{productId}")
     @PreAuthorize("hasAuthority('ADMIN') or #username == principal")
     public ResponseEntity<?> updateCartItem(
             @PathVariable String username,
@@ -233,7 +237,7 @@ public class UserController {
     }
 
 
-    @DeleteMapping("/{id}/cart-items/{productId}")
+    @DeleteMapping("/{username}/cart-items/{productId}")
     @PreAuthorize("hasAuthority('ADMIN') or #username == principal")
     public ResponseEntity<?> deleteCartItem(@PathVariable String username, @PathVariable long productId) {
         User user = userService.findByUsername(username);
@@ -245,5 +249,53 @@ public class UserController {
 
         cartService.delete(cartService.findByKey(cartKey));
         return ResponseEntity.noContent().build();
+    }
+
+
+    // ----------------- Orders -----------------
+    @GetMapping("/{username}/orders")
+    @PreAuthorize("hasAuthority('ADMIN') or #username == principal")
+    public ResponseEntity<?> showOrders(@PathVariable String username) {
+        User user = userService.findByUsername(username);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(user.getOrders());
+    }
+
+    @GetMapping("/{username}/orders/{orderId}")
+    @PreAuthorize("hasAuthority('ADMIN') or #username == principal")
+    public ResponseEntity<?> showOrder(@PathVariable String username, @PathVariable long orderId) {
+        User user = userService.findByUsername(username);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(user.getOrders().stream().filter(order -> order.getId() == orderId).findFirst().orElse(null));
+    }
+
+    // ----------------- Trades -----------------
+
+    @GetMapping("/{username}/trades")
+    @PreAuthorize("hasAuthority('ADMIN') or #username == principal")
+    public ResponseEntity<?> showTrades(@PathVariable String username) {
+        User user = userService.findByUsername(username);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(user.getTrades());
+    }
+
+    @GetMapping("/{username}/trades/{tradeId}")
+    @PreAuthorize("hasAuthority('ADMIN') or #username == principal")
+    public ResponseEntity<?> showTrade(@PathVariable String username, @PathVariable long tradeId) {
+        User user = userService.findByUsername(username);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(user.getTrades().stream().filter(trade -> trade.getId() == tradeId).findFirst().orElse(null));
     }
 }
