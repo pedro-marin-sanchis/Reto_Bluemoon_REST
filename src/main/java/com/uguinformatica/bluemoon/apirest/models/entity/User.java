@@ -1,5 +1,6 @@
 package com.uguinformatica.bluemoon.apirest.models.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
@@ -54,6 +55,7 @@ public class User {
     @Basic
     @Column(name = "password_hash")
     @NotEmpty(message = "No password specified")
+    @JsonIgnore
     private String password;
 
     @Basic

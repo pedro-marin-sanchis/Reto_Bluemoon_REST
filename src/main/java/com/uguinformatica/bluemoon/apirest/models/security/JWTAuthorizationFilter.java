@@ -5,6 +5,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -19,7 +20,9 @@ import java.util.stream.Collectors;
 public class JWTAuthorizationFilter extends OncePerRequestFilter {
     private static final String HEADER_AUTHORIZATION_KEY = "Authorization";
     private static final String TOKEN_BEARER_PREFIX = "Bearer ";
-    private static final String SUPER_SECRET_KEY = "mySecretKey";
+
+    @Value("${jwt.secret}")
+    private String secretKey;
 
 
     private Claims setSigningKey(HttpServletRequest request) {
@@ -28,7 +31,7 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
                 replace(TOKEN_BEARER_PREFIX, "");
 
         return Jwts.parser()
-                .setSigningKey(SUPER_SECRET_KEY.getBytes())
+                .setSigningKey(secretKey.getBytes())
                 .parseClaimsJws(jwtToken)
                 .getBody();
     }

@@ -3,6 +3,7 @@ package com.uguinformatica.bluemoon.apirest.models.security;
 import com.uguinformatica.bluemoon.apirest.models.entity.User;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -14,10 +15,13 @@ import java.util.stream.Collectors;
 @Configuration
 public class JWTAuthtenticationConfig {
     private static final String TOKEN_BEARER_PREFIX = "Bearer ";
-    private static final String SUPER_SECRET_KEY = "mySecretKey";
+    @Value("${jwt.secret}")
+    private String secretKey;
+
+    @Value("${jwt.expiration}")
+    private long expiration;
 
     public String getJWTToken(User user) {
-        String secretKey = SUPER_SECRET_KEY;
 
         System.out.println( "'"+String.join(",", user.getRolesAssociated()
                 .stream()
@@ -41,7 +45,7 @@ public class JWTAuthtenticationConfig {
                                 .map(GrantedAuthority::getAuthority)
                                 .collect(Collectors.toList()))
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 600000))
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(SignatureAlgorithm.HS512,
                         secretKey.getBytes()).compact();
 
