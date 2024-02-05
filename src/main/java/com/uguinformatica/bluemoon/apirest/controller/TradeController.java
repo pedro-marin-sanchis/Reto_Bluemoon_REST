@@ -218,7 +218,7 @@ public class TradeController {
         tradeable.setWeight(newTradeable.weight);
         tradeable.setDescription(newTradeable.description);
         tradeable.setSilverType(silverTypeService.findById(newTradeable.silverTypeId));
-        tradeable.setSellPrice(tradeable.getWeight() * tradeable.getSilverType().getCurrentPrice());
+        tradeable.setSellPrice(newTradeable.sellPrice);
         tradeable.setTrade(trade);
 
         tradeableService.save(tradeable);

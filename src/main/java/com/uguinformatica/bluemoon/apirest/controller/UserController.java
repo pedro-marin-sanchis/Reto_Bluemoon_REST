@@ -6,10 +6,8 @@ import com.uguinformatica.bluemoon.apirest.models.dao.ProductDAOImpl;
 import com.uguinformatica.bluemoon.apirest.models.dao.UserDAOImpl;
 import com.uguinformatica.bluemoon.apirest.models.dto.CartAddItem;
 import com.uguinformatica.bluemoon.apirest.models.dto.CartItemUpdate;
-import com.uguinformatica.bluemoon.apirest.models.dto.OrderCreateDTO;
 import com.uguinformatica.bluemoon.apirest.models.dto.UserRegisterDTO;
 import com.uguinformatica.bluemoon.apirest.models.entity.CartItem;
-import com.uguinformatica.bluemoon.apirest.models.entity.Order;
 import com.uguinformatica.bluemoon.apirest.models.entity.User;
 import com.uguinformatica.bluemoon.apirest.mappers.UserRegisterDtoMapper;
 import com.uguinformatica.bluemoon.apirest.models.entity.keys.CartKey;
@@ -48,25 +46,16 @@ public class UserController {
     }
 
     @GetMapping("/{username}")
-    @PreAuthorize("hasAuthority('ADMIN') or #username == principal ") // or #username == principal
+    @PreAuthorize("hasAuthority('ADMIN') or #username == principal  or #username == 'me'")
     public ResponseEntity<?> show(@PathVariable String username) {
 
-        System.out.println(SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        User user = username.equals("me") ? getUserIfMe() : userService.findByUsername(username);
+        return user != null ? ResponseEntity.ok(user) : ResponseEntity.notFound().build();
+    }
 
-        /*if (username.equals("me")) {
-            String requestUsername = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
-            User user = userService.findByUsername(requestUsername);
-            return ResponseEntity.ok(user);
-        }*/
-
-        User user = null;
-
-        user = userService.findByUsername(username);
-        if (user == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok(user);
+    private User getUserIfMe() {
+        String requestUsername = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+        return userService.findByUsername(requestUsername);
     }
 
     @PostMapping("")
@@ -109,21 +98,14 @@ public class UserController {
     }
 
     @PutMapping("/{username}")
-    @PreAuthorize("hasAuthority('ADMIN') or #username == principal")
+    @PreAuthorize("hasAuthority('ADMIN') or #username == principal or #username == 'me'")
     public ResponseEntity<?> update(@PathVariable String username, @RequestBody @Valid User user, BindingResult result) {
-        User userFound = userService.findByUsername(username);
 
-        if (userFound == null) {
-            return ResponseEntity.notFound().build();
+        User userFound = username.equals("me") ? getUserIfMe() : userService.findByUsername(username);
+        if (userFound == null || result.hasFieldErrors()) {
+            return userFound == null ? ResponseEntity.notFound().build() : ControllerValidationErrors.generateFieldErrors(result);
         }
-
-        if (result.hasFieldErrors()) {
-            return ControllerValidationErrors.generateFieldErrors(result);
-
-        }
-
         user.setId(userFound.getId());
-
         userService.update(user);
         return ResponseEntity.ok(user);
     }
@@ -131,9 +113,9 @@ public class UserController {
 
     // ----------------- Cart -----------------
     @GetMapping("/{username}/cart-items")
-    @PreAuthorize("hasAuthority('ADMIN') or #username == principal")
+    @PreAuthorize("hasAuthority('ADMIN') or #username == principal or #username == 'me'")
     public ResponseEntity<?> showCartItems(@PathVariable String username) {
-        User user = userService.findByUsername(username);
+        User user = username.equals("me") ? getUserIfMe() : userService.findByUsername(username);
         if (user == null) {
             return ResponseEntity.notFound().build();
         }
@@ -143,10 +125,10 @@ public class UserController {
     }
 
     @PostMapping("/{username}/cart-items")
-    @PreAuthorize("hasAuthority('ADMIN') or #username == principal")
+    @PreAuthorize("hasAuthority('ADMIN') or #username == principal or #username == 'me'")
     public ResponseEntity<?> addToCart(@PathVariable String username, @RequestBody @Valid CartAddItem cartAddData, BindingResult result) {
 
-        User user = userService.findByUsername(username);
+        User user = username.equals("me") ? getUserIfMe() : userService.findByUsername(username);
 
         if (user == null) {
             return ResponseEntity.notFound().build();
@@ -177,10 +159,10 @@ public class UserController {
     }
 
     @GetMapping("/{username}/cart-items/{productId}")
-    @PreAuthorize("hasAuthority('ADMIN') or #username == principal")
+    @PreAuthorize("hasAuthority('ADMIN') or #username == principal or #username == 'me'")
     public ResponseEntity<?> showCartItem(@PathVariable String username, @PathVariable long productId) {
 
-        User user = userService.findByUsername(username);
+        User user = username.equals("me") ? getUserIfMe() : userService.findByUsername(username);
 
         if (user == null) {
             return ResponseEntity.notFound().build();
@@ -199,7 +181,7 @@ public class UserController {
     }
 
     @PutMapping("/{username}/cart-items/{productId}")
-    @PreAuthorize("hasAuthority('ADMIN') or #username == principal")
+    @PreAuthorize("hasAuthority('ADMIN') or #username == principal or #username == 'me'")
     public ResponseEntity<?> updateCartItem(
             @PathVariable String username,
             @PathVariable long productId,
@@ -207,7 +189,7 @@ public class UserController {
             BindingResult result
     ) {
 
-        User user = userService.findByUsername(username);
+        User user = username.equals("me") ? getUserIfMe() : userService.findByUsername(username);
 
         if (user == null) {
             return ResponseEntity.notFound().build();
@@ -238,9 +220,9 @@ public class UserController {
 
 
     @DeleteMapping("/{username}/cart-items/{productId}")
-    @PreAuthorize("hasAuthority('ADMIN') or #username == principal")
+    @PreAuthorize("hasAuthority('ADMIN') or #username == principal or #username == 'me'")
     public ResponseEntity<?> deleteCartItem(@PathVariable String username, @PathVariable long productId) {
-        User user = userService.findByUsername(username);
+        User user = username.equals("me") ? getUserIfMe() : userService.findByUsername(username);
         if (user == null) {
             return ResponseEntity.notFound().build();
         }
@@ -254,9 +236,9 @@ public class UserController {
 
     // ----------------- Orders -----------------
     @GetMapping("/{username}/orders")
-    @PreAuthorize("hasAuthority('ADMIN') or #username == principal")
+    @PreAuthorize("hasAuthority('ADMIN') or #username == principal or #username == 'me'")
     public ResponseEntity<?> showOrders(@PathVariable String username) {
-        User user = userService.findByUsername(username);
+        User user = username.equals("me") ? getUserIfMe() : userService.findByUsername(username);
         if (user == null) {
             return ResponseEntity.notFound().build();
         }
@@ -265,9 +247,9 @@ public class UserController {
     }
 
     @GetMapping("/{username}/orders/{orderId}")
-    @PreAuthorize("hasAuthority('ADMIN') or #username == principal")
+    @PreAuthorize("hasAuthority('ADMIN') or #username == principal or #username == 'me'")
     public ResponseEntity<?> showOrder(@PathVariable String username, @PathVariable long orderId) {
-        User user = userService.findByUsername(username);
+        User user = username.equals("me") ? getUserIfMe() : userService.findByUsername(username);
         if (user == null) {
             return ResponseEntity.notFound().build();
         }
@@ -278,9 +260,9 @@ public class UserController {
     // ----------------- Trades -----------------
 
     @GetMapping("/{username}/trades")
-    @PreAuthorize("hasAuthority('ADMIN') or #username == principal")
+    @PreAuthorize("hasAuthority('ADMIN') or #username == principal or #username == 'me'")
     public ResponseEntity<?> showTrades(@PathVariable String username) {
-        User user = userService.findByUsername(username);
+        User user = username.equals("me") ? getUserIfMe() : userService.findByUsername(username);
         if (user == null) {
             return ResponseEntity.notFound().build();
         }
@@ -289,9 +271,9 @@ public class UserController {
     }
 
     @GetMapping("/{username}/trades/{tradeId}")
-    @PreAuthorize("hasAuthority('ADMIN') or #username == principal")
+    @PreAuthorize("hasAuthority('ADMIN') or #username == principal or #username == 'me'")
     public ResponseEntity<?> showTrade(@PathVariable String username, @PathVariable long tradeId) {
-        User user = userService.findByUsername(username);
+        User user = username.equals("me") ? getUserIfMe() : userService.findByUsername(username);
         if (user == null) {
             return ResponseEntity.notFound().build();
         }
