@@ -1,4 +1,4 @@
-package com.uguinformatica.bluemoon.apirest.models.security;
+package com.uguinformatica.bluemoon.apirest.security;
 
 import com.uguinformatica.bluemoon.apirest.models.entity.User;
 import io.jsonwebtoken.Jwts;

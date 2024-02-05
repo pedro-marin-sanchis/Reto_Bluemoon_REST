@@ -4,22 +4,16 @@ import com.uguinformatica.bluemoon.apirest.controller.utils.ControllerValidation
 import com.uguinformatica.bluemoon.apirest.models.dao.UserDAOImpl;
 import com.uguinformatica.bluemoon.apirest.models.dto.LoginPost;
 import com.uguinformatica.bluemoon.apirest.models.entity.User;
-import com.uguinformatica.bluemoon.apirest.models.security.JWTAuthtenticationConfig;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import com.uguinformatica.bluemoon.apirest.security.JWTAuthtenticationConfig;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -55,7 +49,7 @@ public class SesionController {
 
         String token = authtenticationConfig.getJWTToken(user);
 
-        return ResponseEntity.ok(token);
+        return ResponseEntity.ok(Map.of("token", token));
 
     }
 
