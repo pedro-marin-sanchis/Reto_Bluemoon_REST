@@ -21,16 +21,16 @@ public class Trade {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id")
-    @Min(value = 1, message = "The id must be valid")
-    private long id;
+    @Min(value = 0, message = "The id must be valid")
+    private long id ;
 
     @Basic
     @Column(name = "date")
     private Date date;
 
     @Basic
-    @Column(name = "validated default false")
-    private Boolean validated;
+    @Column(name = "validated")
+    private Boolean validated = false;
 
     @ManyToOne
     @JoinColumn(name = "user_id")

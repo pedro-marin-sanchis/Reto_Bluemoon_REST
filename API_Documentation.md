@@ -8,6 +8,7 @@
     - [Obtener usuarios](#obtener-usuarios)
     - [Crear usuarios](#crear-usuarios)
     - [Modificar usuarios](#modificar-usuarios)
+    - [Modificar contraseña](#modificar-contraseña)
     - [Borrar usuarios](#borrar-usuarios)
 - [Orders](#orders)
     - [Obtener pedidos](#obtener-pedidos)
@@ -101,6 +102,21 @@
     "name",
     "surnames",
     "email",
+    "password"
+  }
+  ```
+
+### Modificar contraseña
+
+- Para modificar la contraseña de un usuario:
+  `PUT /api/users/{username}/password` (ADMIN o nombre de usuario = usuario logueado o "me")
+
+  Siendo `{username}` el nombre del usuario al que se le quiere modificar la contraseña.
+
+  Con un JSON con este formato en el body:
+
+  ```json
+  {
     "password"
   }
   ```

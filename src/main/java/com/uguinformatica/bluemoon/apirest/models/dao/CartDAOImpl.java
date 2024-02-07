@@ -8,10 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Repository
-public class CartDAOImpl implements CartDAO{
+public class CartDAOImpl implements CartDAO {
 
     private final EntityManager entityManager;
 
@@ -30,6 +28,14 @@ public class CartDAOImpl implements CartDAO{
     @Transactional
     public void delete(CartItem cartItem) {
         entityManager.remove(cartItem);
+    }
+
+    @Override
+    @Transactional
+    public void deleteAllByUser(long userId) {
+        Query query = entityManager.createQuery("DELETE FROM CartItem c WHERE user.id = :userId");
+        query.setParameter("userId", userId);
+        query.executeUpdate();
     }
 
     @Override

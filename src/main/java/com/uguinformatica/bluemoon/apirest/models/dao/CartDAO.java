@@ -13,6 +13,8 @@ public interface CartDAO {
 
     void delete(CartItem cartItem);
 
+    void deleteAllByUser(long userId);
+
     void update(CartItem cartItem);
 
 

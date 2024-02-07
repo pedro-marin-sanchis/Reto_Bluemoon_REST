@@ -60,6 +60,7 @@ public class TradeController {
         }
 
         Trade trade = new Trade();
+
         trade.setDate(new Date());
 
         trade.setUser(userService.findById(newTrade.userId));
@@ -77,6 +78,7 @@ public class TradeController {
             return tradeableService.save(newTradeable);
 
         }).collect(Collectors.toSet()));
+
 
         tradeService.save(trade);
         return ResponseEntity.ok(newTrade);

@@ -1,17 +1,12 @@
 package com.uguinformatica.bluemoon.apirest.controller;
 
 import com.uguinformatica.bluemoon.apirest.controller.utils.ControllerValidationErrors;
-import com.uguinformatica.bluemoon.apirest.models.dao.OrderDAOImpl;
-import com.uguinformatica.bluemoon.apirest.models.dao.ProductDAOImpl;
-import com.uguinformatica.bluemoon.apirest.models.dao.ProductOrderDAOImpl;
-import com.uguinformatica.bluemoon.apirest.models.dao.UserDAOImpl;
+import com.uguinformatica.bluemoon.apirest.models.dao.*;
 import com.uguinformatica.bluemoon.apirest.models.dto.OrderCreateDTO;
 import com.uguinformatica.bluemoon.apirest.models.entity.Order;
-import com.uguinformatica.bluemoon.apirest.models.entity.Product;
 import com.uguinformatica.bluemoon.apirest.models.entity.ProductOrder;
 import com.uguinformatica.bluemoon.apirest.models.entity.User;
 import com.uguinformatica.bluemoon.apirest.models.entity.keys.ProductOrderKey;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,7 +26,8 @@ public class OrdersController {
 
     @Autowired
     private UserDAOImpl userService;
-
+    @Autowired
+    private CartDAOImpl cartService;
     @Autowired
     private ProductOrderDAOImpl productOrderService;
 
@@ -71,7 +67,7 @@ public class OrdersController {
             productOrder.setProduct(cartItem.getProduct());
             productOrder.setQuantity(cartItem.getQuantity());
 
-           ProductOrderKey productOrderKey = new ProductOrderKey();
+            ProductOrderKey productOrderKey = new ProductOrderKey();
 
             productOrderKey.setOrderId(order.getId());
             productOrderKey.setProductId(cartItem.getProduct().getId());
@@ -84,6 +80,8 @@ public class OrdersController {
         }).collect(Collectors.toSet()));
 
         order.setDate(new Date());
+
+        cartService.deleteAllByUser(user.getId());
 
         ordersService.save(order);
         return ResponseEntity.ok(order);
@@ -118,4 +116,5 @@ public class OrdersController {
 
         ordersService.update(orderFound);
         return ResponseEntity.ok(order);
-    }}
+    }
+}

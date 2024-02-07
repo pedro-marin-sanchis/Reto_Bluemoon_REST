@@ -23,11 +23,6 @@ public class JWTAuthtenticationConfig {
 
     public String getJWTToken(User user) {
 
-        System.out.println( "'"+String.join(",", user.getRolesAssociated()
-                .stream()
-                .map(role -> role.getName())
-                .collect(Collectors.toList())) + "'"
-        );
 
         List<GrantedAuthority> grantedAuthorities = AuthorityUtils
                 .commaSeparatedStringToAuthorityList(String.join(",", user.getRolesAssociated()

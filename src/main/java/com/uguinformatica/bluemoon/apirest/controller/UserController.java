@@ -4,9 +4,7 @@ import com.uguinformatica.bluemoon.apirest.controller.utils.ControllerValidation
 import com.uguinformatica.bluemoon.apirest.models.dao.CartDAOImpl;
 import com.uguinformatica.bluemoon.apirest.models.dao.ProductDAOImpl;
 import com.uguinformatica.bluemoon.apirest.models.dao.UserDAOImpl;
-import com.uguinformatica.bluemoon.apirest.models.dto.CartAddItem;
-import com.uguinformatica.bluemoon.apirest.models.dto.CartItemUpdate;
-import com.uguinformatica.bluemoon.apirest.models.dto.UserRegisterDTO;
+import com.uguinformatica.bluemoon.apirest.models.dto.*;
 import com.uguinformatica.bluemoon.apirest.models.entity.CartItem;
 import com.uguinformatica.bluemoon.apirest.models.entity.User;
 import com.uguinformatica.bluemoon.apirest.mappers.UserRegisterDtoMapper;
@@ -99,17 +97,47 @@ public class UserController {
 
     @PutMapping("/{username}")
     @PreAuthorize("hasAuthority('ADMIN') or #username == principal or #username == 'me'")
-    public ResponseEntity<?> update(@PathVariable String username, @RequestBody @Valid User user, BindingResult result) {
+    public ResponseEntity<?> update(@PathVariable String username, @RequestBody @Valid UpdateUserEntity newUser, BindingResult result) {
 
-        User userFound = username.equals("me") ? getUserIfMe() : userService.findByUsername(username);
-        if (userFound == null || result.hasFieldErrors()) {
-            return userFound == null ? ResponseEntity.notFound().build() : ControllerValidationErrors.generateFieldErrors(result);
+        User userFound = userService.findByUsername(username.equals("me") ? SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString() : username);
+
+        if (userFound == null) {
+            return ResponseEntity.notFound().build();
         }
-        user.setId(userFound.getId());
-        userService.update(user);
-        return ResponseEntity.ok(user);
+        if (result.hasFieldErrors()) {
+            return ControllerValidationErrors.generateFieldErrors(result);
+        }
+        if (!newUser.username.equals(userFound.getUsername()) && userService.findByUsername(newUser.username) != null) {
+            return ResponseEntity.badRequest().body("Username already exists");
+        }
+
+        userFound.setUsername(newUser.username);
+        userFound.setName(newUser.name);
+        userFound.setSurnames(newUser.surnames);
+        userFound.setEmail(newUser.email);
+        userFound.setAddress(newUser.address);
+        userFound.setBalance(newUser.balance);
+
+        userService.update(userFound);
+        return ResponseEntity.ok(newUser);
     }
 
+    @PutMapping("/{username}/password")
+    @PreAuthorize("hasAuthority('ADMIN') or #username == principal or #username == 'me'")
+    public ResponseEntity<?> updatePassword(@PathVariable String username, @RequestBody UpdatePassword password) {
+
+        String actualUsername = username.equals("me") ? SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString() : username;
+
+        User user = userService.findByUsername(actualUsername);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        user.setPassword(passwordEncoder.encode(password.password));
+        userService.update(user);
+
+        return ResponseEntity.ok().build();
+    }
 
     // ----------------- Cart -----------------
     @GetMapping("/{username}/cart-items")

@@ -58,7 +58,6 @@ public class UserDAOImpl implements UserDAO {
 
     @Transactional
     public void update(User user) {
-        System.out.println("UserDAOImpl.update");
         entityManager.merge(user);
     }
 
