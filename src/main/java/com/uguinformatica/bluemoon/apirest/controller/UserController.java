@@ -1,11 +1,11 @@
 package com.uguinformatica.bluemoon.apirest.controller;
 
 import com.uguinformatica.bluemoon.apirest.controller.utils.ControllerValidationErrors;
-import com.uguinformatica.bluemoon.apirest.models.dao.CartDAOImpl;
-import com.uguinformatica.bluemoon.apirest.models.dao.ProductDAOImpl;
-import com.uguinformatica.bluemoon.apirest.models.dao.UserDAOImpl;
+import com.uguinformatica.bluemoon.apirest.models.dao.*;
 import com.uguinformatica.bluemoon.apirest.models.dto.*;
 import com.uguinformatica.bluemoon.apirest.models.entity.CartItem;
+import com.uguinformatica.bluemoon.apirest.models.entity.Trade;
+import com.uguinformatica.bluemoon.apirest.models.entity.Tradeable;
 import com.uguinformatica.bluemoon.apirest.models.entity.User;
 import com.uguinformatica.bluemoon.apirest.mappers.UserRegisterDtoMapper;
 import com.uguinformatica.bluemoon.apirest.models.entity.keys.CartKey;
@@ -18,7 +18,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/users")
@@ -32,10 +34,19 @@ public class UserController {
 
     @Autowired
     private CartDAOImpl cartService;
+    @Autowired
+    private TradeDAOImpl tradeService;
 
+    @Autowired
+    private SilverTypeDAOImpl silverTypeService;
+
+    @Autowired
+    private TradeableDAOImpl tradeableService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("")
@@ -100,6 +111,7 @@ public class UserController {
     public ResponseEntity<?> update(@PathVariable String username, @RequestBody @Valid UpdateUserEntity newUser, BindingResult result) {
 
         User userFound = userService.findByUsername(username.equals("me") ? SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString() : username);
+
 
         if (userFound == null) {
             return ResponseEntity.notFound().build();
@@ -308,4 +320,44 @@ public class UserController {
 
         return ResponseEntity.ok(user.getTrades().stream().filter(trade -> trade.getId() == tradeId).findFirst().orElse(null));
     }
+
+    @PostMapping("/{username}/trades")
+    @PreAuthorize("hasAuthority('ADMIN') or #username == principal or #username == 'me'")
+    public ResponseEntity<?> createTrade(@PathVariable String username, @RequestBody @Valid UserTradeCreateEntity tradeCreate, BindingResult result) {
+
+        User user = username.equals("me") ? getUserIfMe() : userService.findByUsername(username);
+        if (user == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (result.hasFieldErrors()) {
+            List<String> errors = result.getFieldErrors()
+                    .stream()
+                    .map(err -> "The field '" + err.getField() + "' " + err.getDefaultMessage()).toList();
+
+            return ResponseEntity.badRequest().body(errors);
+        }
+
+        Trade trade = new Trade();
+
+        trade.setUser(user);
+        trade.setDate(new Date());
+
+        trade.setTradeables(tradeCreate.tradeables.stream().map((tradeable) -> {
+            Tradeable newTradeable = new Tradeable();
+            newTradeable.setWeight(tradeable.weight);
+            newTradeable.setDescription(tradeable.description);
+
+            newTradeable.setSilverType(silverTypeService.findById(tradeable.silverTypeId));
+
+            newTradeable.setSellPrice(tradeable.weight * newTradeable.getSilverType().getCurrentPrice());
+
+            return tradeableService.save(newTradeable);
+
+        }).collect(Collectors.toSet()));
+        tradeService.save(trade);
+
+        return ResponseEntity.ok(user.getTrades());
+    }
+
 }
