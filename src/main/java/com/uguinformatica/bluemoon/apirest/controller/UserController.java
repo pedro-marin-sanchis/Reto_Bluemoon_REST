@@ -3,10 +3,7 @@ package com.uguinformatica.bluemoon.apirest.controller;
 import com.uguinformatica.bluemoon.apirest.controller.utils.ControllerValidationErrors;
 import com.uguinformatica.bluemoon.apirest.models.dao.*;
 import com.uguinformatica.bluemoon.apirest.models.dto.*;
-import com.uguinformatica.bluemoon.apirest.models.entity.CartItem;
-import com.uguinformatica.bluemoon.apirest.models.entity.Trade;
-import com.uguinformatica.bluemoon.apirest.models.entity.Tradeable;
-import com.uguinformatica.bluemoon.apirest.models.entity.User;
+import com.uguinformatica.bluemoon.apirest.models.entity.*;
 import com.uguinformatica.bluemoon.apirest.mappers.UserRegisterDtoMapper;
 import com.uguinformatica.bluemoon.apirest.models.entity.keys.CartKey;
 import jakarta.validation.Valid;
@@ -19,7 +16,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -42,6 +41,8 @@ public class UserController {
 
     @Autowired
     private TradeableDAOImpl tradeableService;
+
+    @Autowired RoleDAOImpl roleService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -87,8 +88,11 @@ public class UserController {
             return ResponseEntity.badRequest().body(errors);
         }
 
+        Role role = roleService.findByRoleName("USER");
+
         User userEntity = UserRegisterDtoMapper.map(user);
 
+        userEntity.setRolesAssociated(Set.of(role));
         userEntity.setPassword(passwordEncoder.encode(user.password));
 
         userService.save(userEntity);
