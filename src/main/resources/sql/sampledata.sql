@@ -12,7 +12,7 @@ INSERT INTO public.silver_type (current_price, disabled, name) VALUES
 
 -- Insert mock data into public."user"
 INSERT INTO public."user" (address, balance, email, name, password_hash, surnames, username) VALUES
-                                                                                                 ('User 1 Address', 100.0, 'user1@example.com', 'User 1', 'hash1', 'Surname 1', 'username1'),
+                                                                                                 ('Computer Hardware', 100.0, 'bluemood_admin@bluemoon.com', 'Blue Moon', '$2y$10$mYRmCJmc5jcD2dniHqJISOfQRqTXCayVibX/t2kynDPyL0X0cUOpy', 'Admin', 'bluemoon_admin'),
                                                                                                  ('User 2 Address', 200.0, 'user2@example.com', 'User 2', 'hash2', 'Surname 2', 'username2'),
                                                                                                  ('User 3 Address', 300.0, 'user3@example.com', 'User 3', 'hash3', 'Surname 3', 'username3');
 
