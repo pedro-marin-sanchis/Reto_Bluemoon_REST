@@ -11,4 +11,4 @@ ENTRYPOINT java -jar /app.jar --spring.datasource.url=$JDBC_URL --spring.datasou
 # docker build -t bluemoonrestapi .
 # docker run -p 8080:8080 bluemoonrestapi
 # docker run -p 8080:8080 -e JDBC_URL=url DB_USER_USERNAME=postgres DB_USER_PASSWORD=secret bluemoonrestapi
-# docker run -p 8082:8080 -e JDBC_URL=jdbc:postgresql://192.168.1.129:5432/postgres -e DB_USER_USERNAME=postgres -e DB_USER_PASSWORD=secret bluemoonrestapi
+# docker run -p 8080:8080 -e JDBC_URL=jdbc:postgresql://192.168.1.129:5432/postgres -e DB_USER_USERNAME=postgres -e DB_USER_PASSWORD=secret bluemoonrestapi
