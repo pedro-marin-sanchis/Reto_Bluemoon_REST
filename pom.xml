@@ -10,12 +10,13 @@
     </parent>
     <groupId>com.uguinformatica</groupId>
     <artifactId>Bluemoon_API</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <name>API_reto_bluemoon</name>
     <description>API_reto_bluemoon</description>
     <properties>
         <java.version>17</java.version>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
@@ -55,7 +56,8 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <scope>annotationProcessor</scope>
+            <version>1.18.30</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
