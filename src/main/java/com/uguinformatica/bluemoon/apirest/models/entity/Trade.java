@@ -38,7 +38,7 @@ public class Trade {
 
     private User user;
 
-    @OneToMany(mappedBy = "trade")
+    @OneToMany(mappedBy = "trade", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Tradeable> tradeables;
 
 }
